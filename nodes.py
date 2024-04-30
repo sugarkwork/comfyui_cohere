@@ -78,7 +78,7 @@ class SimpleCohereNode:
             return (response, )
         
         if not response:
-            response = self.client.chat(
+            response = cohere_client.chat(
                 chat_history=[
                     {"role": "SYSTEM", "message": str(system)},
                 ],
