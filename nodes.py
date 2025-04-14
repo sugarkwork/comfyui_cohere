@@ -73,7 +73,7 @@ class SimpleCohereNode:
         key = f"cohere: system={system} , text={text}"
         response = load_memory(key)
         if response is not None:
-            return (response.message.content[0].text, )
+            return (response, )
         
         if not response:
             response = cohere_client.chat(
@@ -84,7 +84,7 @@ class SimpleCohereNode:
                 model="command-r-plus"
             )
         
-        save_memory(key, response)
+        save_memory(key, response.message.content[0].text)
 
 
         return (response.message.content[0].text, )
