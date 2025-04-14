@@ -8,11 +8,9 @@ import cohere
 
 lock = threading.Lock()
 
-
 cache_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),"cache.pkl")
 
-
-cohere_client = cohere.Client(os.getenv("COHERE_API_KEY"))
+cohere_client = cohere.ClientV2()
 
 
 def save_memory(key, val):
@@ -75,19 +73,21 @@ class SimpleCohereNode:
         key = f"cohere: system={system} , text={text}"
         response = load_memory(key)
         if response is not None:
-            return (response, )
+            return (response.message.content[0].text, )
         
         if not response:
-            response = self.client.chat(
-                chat_history=[
-                    {"role": "SYSTEM", "message": str(system)},
+            response = cohere_client.chat(
+                messages=[
+                    {"role": "system", "content": str(system)},
+                    {"role": "user", "content": str(text)},
                 ],
-                message=str(text),
                 model="command-r-plus"
-            ).text
+            )
         
         save_memory(key, response)
-        return (response, )
+
+
+        return (response.message.content[0].text, )
 
 
 NODE_CLASS_MAPPINGS = {
@@ -97,3 +97,12 @@ NODE_CLASS_MAPPINGS = {
 NODE_DISPLAY_NAME_MAPPINGS = {
     "SimpleCohereNode": "SimpleCohereNode"
 }
+
+
+def simple_test():
+    node = SimpleCohereNode()
+    print(node.cohere("You are a friendly AI assistant.", "Hello, how are you?"))
+
+
+#if __name__ == "__main__":
+#    simple_test()
