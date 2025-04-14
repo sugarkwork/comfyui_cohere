@@ -10,8 +10,6 @@ lock = threading.Lock()
 
 cache_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),"cache.pkl")
 
-cohere_client = cohere.ClientV2()
-
 
 def save_memory(key, val):
     while True:
@@ -49,7 +47,13 @@ def load_memory(key, defval=None):
 
 class SimpleCohereNode:
     def __init__(self):
-        pass
+        api_key = os.environ.get("COHERE_API_KEY", None)
+        if api_key is None:
+            api_key = os.environ.get("CO_API_KEY", None)
+        if api_key is None:
+            raise Exception("COHERE_API_KEY is not set")
+        print(f"Cohere API Key: {api_key}")
+        self.client = cohere.ClientV2(api_key)
 
     @classmethod
     def INPUT_TYPES(s):
@@ -76,7 +80,7 @@ class SimpleCohereNode:
             return (response, )
         
         if not response:
-            response = cohere_client.chat(
+            response = self.client.chat(
                 messages=[
                     {"role": "system", "content": str(system)},
                     {"role": "user", "content": str(text)},
@@ -85,7 +89,6 @@ class SimpleCohereNode:
             )
         
         save_memory(key, response.message.content[0].text)
-
 
         return (response.message.content[0].text, )
 
@@ -100,6 +103,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
 
 
 def simple_test():
+    os.environ["COHERE_API_KEY"] = "api key"
     node = SimpleCohereNode()
     print(node.cohere("You are a friendly AI assistant.", "Hello, how are you?"))
 
