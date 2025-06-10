@@ -1,7 +1,7 @@
 [project]
 name = "comfyui_cohere"
-description = "This is a node for using cohere (Command R+) from ComfyUI. You need to edit the startup .bat file of ComfyUI and describe the API key obtained from Cohere as follows."
-version = "1.0.0"
+description = "This is a node for using cohere (Command-A) from ComfyUI. You need to edit the startup .bat file of ComfyUI and describe the API key obtained from Cohere as follows."
+version = "1.0.1"
 license = "LICENSE"
 dependencies = ["cohere"]
 
