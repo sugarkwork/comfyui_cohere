@@ -110,5 +110,5 @@ def simple_test():
     print(node.cohere("日本語で話すアシスタントです", "Hello, how are you?"))
 
 
-if __name__ == "__main__":
-    simple_test()
+#if __name__ == "__main__":
+#    simple_test()
