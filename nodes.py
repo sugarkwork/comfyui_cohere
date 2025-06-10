@@ -52,7 +52,6 @@ class SimpleCohereNode:
             api_key = os.environ.get("CO_API_KEY", None)
         if api_key is None:
             raise Exception("COHERE_API_KEY is not set")
-        print(f"Cohere API Key: {api_key}")
         self.client = cohere.ClientV2(api_key)
 
     @classmethod
@@ -80,15 +79,18 @@ class SimpleCohereNode:
             return (response, )
         
         if not response:
+            messages=[]
+
+            if system:
+                messages.append({"role": "system", "content": str(system)})
+            messages.append({"role": "user", "content": str(text)})
+            
             response = self.client.chat(
-                messages=[
-                    {"role": "system", "content": str(system)},
-                    {"role": "user", "content": str(text)},
-                ],
-                model="command-r-plus"
+                messages=messages,
+                model="command-a-03-2025"
             )
         
-        save_memory(key, response.message.content[0].text)
+            save_memory(key, response.message.content[0].text)
 
         return (response.message.content[0].text, )
 
@@ -103,10 +105,10 @@ NODE_DISPLAY_NAME_MAPPINGS = {
 
 
 def simple_test():
-    os.environ["COHERE_API_KEY"] = "api key"
+    os.environ["COHERE_API_KEY"] = ""
     node = SimpleCohereNode()
-    print(node.cohere("You are a friendly AI assistant.", "Hello, how are you?"))
+    print(node.cohere("日本語で話すアシスタントです", "Hello, how are you?"))
 
 
-#if __name__ == "__main__":
-#    simple_test()
+if __name__ == "__main__":
+    simple_test()
